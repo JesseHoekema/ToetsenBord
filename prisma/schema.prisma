@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     Int       @id @default(autoincrement())
+  name                   String
+  email                  String    @unique
+  password               String
+  createdAt              DateTime  @default(now())
+  somtodayToken          String?   @db.LongText
+  somtodayTokenUpdatedAt DateTime?
+  somtodayRefreshToken   String?   @db.LongText
+  somtodayTokenExpires   BigInt?
+  profilePicture         String?   @db.LongText
+  sessions               Session[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "Session_userId_fkey")
+}
+
+model Exam {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  vak       String
+  dateDue   DateTime
+  notes     String?   @db.LongText
+  links     Json      @default("[]")
+  books     Json      @default("[]")
+}
+model Book {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  title     String    @db.LongText
+  type      String
+  userId    Int
+  onlineBook String?   @db.LongText
+  importantPages Json?
+}

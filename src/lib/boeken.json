@@ -1,0 +1,136 @@
+{
+    "boeken": [
+        {
+            "vak": "Nederlands",
+            "image_url": "/assets/books/Nederlands.png"
+        },
+        {
+            "vak": "Engels",
+            "image_url": "/assets/books/Engels.png"
+        },
+        {
+            "vak": "Duits",
+            "image_url": "/assets/books/Duits.png"
+        },
+        {
+            "vak": "Frans",
+            "image_url": "/assets/books/Frans.png"
+        },
+        {
+            "vak": "Spaans",
+            "image_url": "/assets/books/Spaans.png"
+        },
+        {
+            "vak": "Italiaans",
+            "image_url": "/assets/books/Italiaans.png"
+        },
+        {
+            "vak": "Latijn",
+            "image_url": "/assets/books/Latijn.png"
+        },
+        {
+            "vak": "Grieks",
+            "image_url": "/assets/books/Grieks.png"
+        },
+        {
+            "vak": "Wiskunde",
+            "image_url": "/assets/books/Wiskunde.png"
+        },
+        {
+            "vak": "Natuurkunde",
+            "image_url": "/assets/books/Natuurkunde.png"
+        },
+        {
+            "vak": "Scheikunde",
+            "image_url": "/assets/books/Scheikunde.png"
+        },
+        {
+            "vak": "Biologie",
+            "image_url": "/assets/books/Biologie.png"
+        },
+        {
+            "vak": "Aardrijkskunde",
+            "image_url": "/assets/books/Aardrijkskunde.png"
+        },
+        {
+            "vak": "Geschiedenis",
+            "image_url": "/assets/books/Geschiedenis.png"
+        },
+        {
+            "vak": "Maatschappijleer",
+            "image_url": "/assets/books/Maatschappijleer.png"
+        },
+        {
+            "vak": "Economie",
+            "image_url": "/assets/books/Economie.png"
+        },
+        {
+            "vak": "Informatica",
+            "image_url": "/assets/books/Informatica.png"
+        },
+        {
+            "vak": "Programmeren",
+            "image_url": "/assets/books/Programmeren.png"
+        },
+        {
+            "vak": "CKV",
+            "image_url": "/assets/books/CKV.png"
+        },
+        {
+            "vak": "Levensbeschouwing",
+            "image_url": "/assets/books/Levensbeschouwing.png"
+        },
+        {
+            "vak": "Techniek",
+            "image_url": "/assets/books/Techniek.png"
+        },
+        {
+            "vak": "LO",
+            "image_url": "/assets/books/LO.png"
+        },
+        {
+            "vak": "Kunstvakken",
+            "image_url": "/assets/books/Kunstvakken.png"
+        },
+        {
+            "vak": "Handvaardigheid",
+            "image_url": "/assets/books/Handvaardigheid.png"
+        },
+        {
+            "vak": "Tekenen",
+            "image_url": "/assets/books/Tekenen.png"
+        },
+        {
+            "vak": "Beeldende Vorming",
+            "image_url": "/assets/books/Beeldende_Vorming.png"
+        },
+        {
+            "vak": "Muziek",
+            "image_url": "/assets/books/Muziek.png"
+        },
+        {
+            "vak": "Drama",
+            "image_url": "/assets/books/Drama.png"
+        },
+        {
+            "vak": "Mediawijsheid",
+            "image_url": "/assets/books/Mediawijsheid.png"
+        },
+        {
+            "vak": "Natuur, Leven en Techniek",
+            "image_url": "/assets/books/Natuur,_Leven_en_Techniek.png"
+        },
+        {
+            "vak": "Profielwerkstuk",
+            "image_url": "/assets/books/Profielwerkstuk.png"
+        },
+        {
+            "vak": "Duurzaamheid",
+            "image_url": "/assets/books/Duurzaamheid.png"
+        },
+        {
+            "vak": "Godsdienst En Levensbeschouwing",
+            "image_url": "/assets/books/Godsdienst_En_Levensbeschouwing.png"
+        }
+    ]
+}

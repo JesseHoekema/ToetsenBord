@@ -1,0 +1,81 @@
+<script lang="ts">
+    import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+    import AppSidebar from "$lib/components/Sidebar.svelte";
+    import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
+    import { Separator } from "$lib/components/ui/separator/index.js";
+    import * as Card from "$lib/components/ui/card/index.js";
+    import toast from "svelte-french-toast";
+    import Button from "@/components/ui/button/button.svelte";
+
+    const { data } = $props();
+</script>
+
+<svelte:head>
+    <title>Start | ToetsenBord</title>
+</svelte:head>
+
+<Sidebar.Provider>
+    <AppSidebar user={data.user} />
+    <Sidebar.Inset>
+        <header class="flex h-14 shrink-0 items-center gap-2">
+            <div class="flex flex-1 items-center gap-2 px-3">
+                <Sidebar.Trigger />
+                <Separator
+                    orientation="vertical"
+                    class="mr-2 data-[orientation=vertical]:h-4"
+                />
+                <Breadcrumb.Root>
+                    <Breadcrumb.List>
+                        <Breadcrumb.Item>
+                            <Breadcrumb.Page class="line-clamp-1">
+                                Home
+                            </Breadcrumb.Page>
+                        </Breadcrumb.Item>
+                    </Breadcrumb.List>
+                </Breadcrumb.Root>
+            </div>
+            <div class="ml-auto px-3"></div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-6 pt-2">
+            <!-- Aankomende Toetsen -->
+            <div class="">
+                <h2 class="text-2xl font-semibold mb-2">Aankomende Toetsen</h2>
+                <div class="flex gap-8 overflow-x-auto">
+                    {#each data.exams ?? [] as exam}
+                        <a href={exam.link}>
+                            <Card.Root
+                                class="w-48 h-69 p-0 flex flex-col hover:scale-101 transition-all cursor-pointer"
+                            >
+                                <img
+                                    src={exam.imageUrl}
+                                    alt="boeken"
+                                    class="rounded-t-xl h-50 w-full object-cover"
+                                />
+                                <div class="ml-2 mt-[-20px]">
+                                    <h1 class="text-2xl">{exam.vak}</h1>
+                                    <p class="text-sm">{exam.formattedDate}</p>
+                                </div>
+                            </Card.Root>
+                        </a>
+                    {/each}
+
+                    {#if data.exams === null}
+                        <div class="flex flex-col gap-4 mt-3">
+                            <h1 class="text-lg">
+                                Om toetsen te laten zien koppel eerst somtoday!
+                            </h1>
+                            <a href="/somtoday-integration">
+                                <Button>Koppel Somtoday</Button>
+                            </a>
+                        </div>
+                    {/if}
+
+                    {#if data.exams?.length === 0}
+                        <h1>Je hebt geen bekende toetsen meer! 🥳</h1>
+                    {/if}
+                </div>
+            </div>
+        </main>
+    </Sidebar.Inset>
+</Sidebar.Provider>
