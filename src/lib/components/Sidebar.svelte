@@ -26,7 +26,7 @@
         { title: "Toetsen", url: "/exams", icon: TestIcon },
         { title: "Mijn Boeken", url: "/books", icon: SchoolBooks },
         { title: "Cijfers", url: "/grades", icon: GradesIcon },
-        { title: "Mijn Woordenlijsten", url: "/results", icon: WordLists },
+        // { title: "Mijn Woordenlijsten", url: "/results", icon: WordLists },
     ];
 
     function updateLogo() {
