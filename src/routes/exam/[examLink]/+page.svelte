@@ -22,7 +22,7 @@
     let isSaving = $state(false);
     let selectedBook = $state("");
 
-    const books = data.books
+    const books = data.books;
 
     let selectedIcon = $state("globe");
     let linkInput = $state("");
@@ -129,9 +129,15 @@
 
             if (response.ok) {
                 toast.success("Boek toegevoegd!");
+
+                const bookSlug = book?.label
+                    .toLowerCase() // lowercase
+                    .replace(/\s+/g, "-") // replace spaces with -
+                    .replace(/[^\w-]/g, ""); // remove special chars
+
                 examBooks = [
                     ...examBooks,
-                    { title: book?.label || "", link: "#" },
+                    { title: book?.label || "", link: `/books/${bookSlug}` },
                 ];
                 selectedBook = "";
             } else {
@@ -201,6 +207,7 @@
         }
     }
 </script>
+
 <svelte:head>
     <title>{data.exam.vak} - {data.exam.onderwerp} | ToetsenBord</title>
 </svelte:head>
@@ -326,6 +333,7 @@
                             </Card.Content>
                         </Card.Root>
                     {/each}
+
                     {#each examBooks as book}
                         <Card.Root class="mt-3 p-4 cursor-pointer">
                             <Card.Content
