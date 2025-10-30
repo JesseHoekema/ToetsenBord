@@ -1,6 +1,6 @@
 import { prisma } from '$lib/prisma';
 import bcrypt from 'bcrypt';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 export interface AuthResult {
   success: boolean;
