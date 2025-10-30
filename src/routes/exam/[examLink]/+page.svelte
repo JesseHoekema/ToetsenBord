@@ -22,7 +22,12 @@
     let isSaving = $state(false);
     let selectedBook = $state("");
 
-    const books = data.books;
+    interface Book {
+        value: string;
+        label: string;
+    }
+
+    const books: Book[] = data.books as Book[];
 
     let selectedIcon = $state("globe");
     let linkInput = $state("");
