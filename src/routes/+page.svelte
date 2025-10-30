@@ -121,3 +121,14 @@
         </div>
     </div>
 </section>
+
+<footer class="w-full mt-auto">
+    <Card.Root class="w-full mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between rounded-none">
+        <p class="text-sm text-gray-600 dark:text-gray-400">&copy; {new Date().getFullYear()} ToetsenBord. Alle rechten voorbehouden.</p>
+        <div class="flex space-x-4 mt-4 md:mt-0">
+            <a href="#home" class="text-sm text-gray-600 dark:text-gray-400 hover:underline">Home</a>
+            <a href="#waarom" class="text-sm text-gray-600 dark:text-gray-400 hover:underline">Waarom</a>
+            <a href="/login" class="text-sm text-gray-600 dark:text-gray-400 hover:underline">Login</a>
+        </div>
+    </Card.Root>
+</footer>
