@@ -8,6 +8,7 @@
     import ConnectIcon from "@lucide/svelte/icons/link";
     import * as Card from "$lib/components/ui/card/index.js";   
     import toast from 'svelte-french-toast';
+    import { goto } from "$app/navigation";
 
     const { data } = $props();
     
@@ -46,6 +47,7 @@
                 duration: 5000,
             });
             accessToken = ''; 
+            await goto('/start');
         } catch (error) {
             toast.error(
                 error instanceof Error 
