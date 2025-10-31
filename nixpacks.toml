@@ -2,7 +2,7 @@
 nixPkgs = ["nodejs_20", "pnpm"]
 
 [phases.install]
-cmds = ["pnpm install --no-peer-deps"]
+cmds = ["pnpm install --no-strict-peer-dependencies"]
 
 [phases.build]
 cmds = ["pnpm run build"]
