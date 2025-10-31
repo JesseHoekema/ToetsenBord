@@ -2,10 +2,13 @@
 nixPkgs = ["nodejs_22", "pnpm"]
 
 [phases.install]
-cmds = ["pnpm install --no-strict-peer-dependencies"]
+cmds = ["corepack enable", "corepack prepare pnpm@latest --activate", "pnpm install --no-strict-peer-dependencies"]
 
 [phases.build]
 cmds = ["pnpm run build"]
 
 [start]
 cmd = "pnpm run preview"
+
+[env]
+NODE_VERSION = "22.12.0"
