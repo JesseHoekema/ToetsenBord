@@ -46,5 +46,8 @@
 		"mode-watcher": "^1.1.0",
 		"qr-scanner": "^1.4.2",
 		"svelte-french-toast": "^1.2.0"
+	},
+	"engines": {
+		"node": ">=22.12.0"
 	}
 }

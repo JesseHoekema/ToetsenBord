@@ -12,3 +12,4 @@ cmd = "pnpm run preview"
 
 [env]
 NODE_VERSION = "22.12.0"
+NIXPACKS_NODE_VERSION = "22.12.0"
