@@ -501,6 +501,8 @@ export async function getAllHomework(authToken: string) {
 export async function getHomeworkItem(vak: string, datum: string, authToken: string) {
     const homework = await getAllHomework(authToken);
 
+    if (!homework) return null;
+
     const normalizedVak = vak.trim().toLowerCase();
     const targetDate = new Date(datum);
     const { month: targetMonth, day: targetDay } = getMonthDay(targetDate);
