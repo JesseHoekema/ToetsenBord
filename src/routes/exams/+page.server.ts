@@ -33,7 +33,6 @@ export const load: PageServerLoad = async ({ cookies }) => {
     if (updatedUser?.somtodayToken) {
       session.somtodayToken = updatedUser.somtodayToken;
     }
-    console.log(refreshtoken)
   } catch (error) {
     console.log(error)
   }

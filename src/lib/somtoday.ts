@@ -438,7 +438,7 @@ export async function getAllHomework(authToken: string) {
     });
 
     if (response.status === 401) {
-        throw new Error('Somtoday token niet meer geldig')
+        return null;
     }
 
     if (!response.ok) {
