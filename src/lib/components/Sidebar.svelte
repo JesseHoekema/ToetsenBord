@@ -6,7 +6,7 @@
     import HomeworkIcon from "@lucide/svelte/icons/book-open-text";
     import * as Sidebar from "$lib/components/ui/sidebar/index.js";
     import NavUser from "./nav-user.svelte";
-    import GradesIcon from '@lucide/svelte/icons/graduation-cap'
+    import GradesIcon from '@lucide/svelte/icons/arrow-up-0-1'
     import { useSidebar } from "$lib/components/ui/sidebar/index.js";
     import { onMount, tick, onDestroy } from "svelte";
     import { mode } from "mode-watcher";
