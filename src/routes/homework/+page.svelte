@@ -11,7 +11,7 @@
 </script>
 
 <svelte:head>
-    <title>Start | ToetsenBord</title>
+    <title>Huiswerk | ToetsenBord</title>
 </svelte:head>
 
 <Sidebar.Provider>
@@ -28,7 +28,7 @@
                     <Breadcrumb.List>
                         <Breadcrumb.Item>
                             <Breadcrumb.Page class="line-clamp-1">
-                                Home
+                                Huiswerk
                             </Breadcrumb.Page>
                         </Breadcrumb.Item>
                     </Breadcrumb.List>
@@ -38,49 +38,10 @@
         </header>
 
         <main class="flex-1 overflow-y-auto p-6 pt-2">
-            <!-- Aankomende Toetsen -->
             <div class="">
-                <h2 class="text-2xl font-semibold mb-2">Aankomende Toetsen</h2>
-                <div class="flex gap-8 overflow-x-auto">
-                    {#each data.exams ?? [] as exam}
-                        <a href={exam.link}>
-                            <Card.Root
-                                class="w-48 h-69 p-0 flex flex-col hover:scale-101 transition-all cursor-pointer"
-                            >
-                                <img
-                                    src={exam.imageUrl}
-                                    alt="boeken"
-                                    class="rounded-t-xl h-50 w-full object-cover"
-                                />
-                                <div class="ml-2 mt-[-20px]">
-                                    <h1 class="text-2xl truncate">{exam.vak}</h1>
-                                    <p class="text-sm">{exam.formattedDate}</p>
-                                </div>
-                            </Card.Root>
-                        </a>
-                    {/each}
-
-                    {#if data.exams === null}
-                        <div class="flex flex-col gap-4 mt-3">
-                            <h1 class="text-lg">
-                                Om toetsen te laten zien koppel eerst somtoday!
-                            </h1>
-                            <a href="/somtoday-integration">
-                                <Button>Koppel Somtoday</Button>
-                            </a>
-                        </div>
-                    {/if}
-
-                    {#if data.exams?.length === 0}
-                        <h1>Je hebt geen bekende toetsen meer! 🥳</h1>
-                    {/if}
-                </div>
-            </div>
-            <!-- TODO: Aankomend Huiswerk toevoegen -->
-             <div class="mt-5">
-                <h2 class="text-2xl font-semibold mb-2">Aankomend Huiswerk</h2>
-                <div class="flex flex-wrap gap-8 overflow-x-auto">
-                    {#each data.homework ?? [] as homeworkItem}
+                <h2 class="text-2xl font-semibold mb-2">Alle Huiswerk</h2>
+                <div class="flex gap-8 flex-wrap">
+                    {#each (data.homework ?? []).slice().reverse() as homeworkItem}
                         <a href={homeworkItem.link}>
                             <Card.Root
                                 class="w-48 h-69 p-0 flex flex-col hover:scale-101 transition-all cursor-pointer"
@@ -98,8 +59,13 @@
                         </a>
                     {/each}
 
-                    {#if data.homework?.length === 0}
-                        <h1>Je hebt geen bekend huiswerk meer! 🥳</h1>
+                    {#if !data.homework || data.homework.length === 0}
+                        <div class="flex flex-col gap-4 mt-3">
+                            <h1 class="text-lg">Om huiswerk te laten zien koppel eerst somtoday!</h1>
+                            <a href="/somtoday-integration">
+                                <Button>Koppel Somtoday</Button>
+                            </a>
+                        </div>
                     {/if}
                 </div>
             </div>

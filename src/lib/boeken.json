@@ -89,6 +89,10 @@
             "image_url": "/assets/books/LO.png"
         },
         {
+            "vak": "Lichamelijke Opvoeding",
+            "image_url": "/assets/books/LO.png"
+        },
+        {
             "vak": "Kunstvakken",
             "image_url": "/assets/books/Kunstvakken.png"
         },
@@ -131,6 +135,14 @@
         {
             "vak": "Godsdienst En Levensbeschouwing",
             "image_url": "/assets/books/Godsdienst_En_Levensbeschouwing.png"
+        },
+        {
+            "vak": "Rekenen",
+            "image_url": "/assets/books/Rekenen.jpg"
+        },
+        {
+            "vak": "Mentorles",
+            "image_url": "/assets/books/Mentorles.jpg"
         }
     ]
 }

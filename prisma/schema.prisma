@@ -41,6 +41,14 @@ model Exam {
   links     Json      @default("[]")
   books     Json      @default("[]")
 }
+model Homework {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  vak       String
+  dateDue   DateTime
+  notes     String?   @db.LongText
+  links     Json      @default("[]")
+}
 model Book {
   id        Int       @id @default(autoincrement())
   createdAt DateTime  @default(now())

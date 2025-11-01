@@ -3,13 +3,14 @@
     import HomeIcon from "@lucide/svelte/icons/home";
     import TestIcon from "@lucide/svelte/icons/file-text";
     import SchoolBooks from "@lucide/svelte/icons/book";
-    import WordLists from "@lucide/svelte/icons/list";
+    import HomeworkIcon from "@lucide/svelte/icons/book-open-text";
     import * as Sidebar from "$lib/components/ui/sidebar/index.js";
     import NavUser from "./nav-user.svelte";
     import GradesIcon from '@lucide/svelte/icons/graduation-cap'
     import { useSidebar } from "$lib/components/ui/sidebar/index.js";
     import { onMount, tick, onDestroy } from "svelte";
     import { mode } from "mode-watcher";
+  import { Title } from "./ui/alert-dialog";
 
     export let user: { name: string; email: string; avatar: string };
 
@@ -24,6 +25,7 @@
     const items = [
         { title: "Home", url: "/start", icon: HomeIcon },
         { title: "Toetsen", url: "/exams", icon: TestIcon },
+        { title: "Huiswerk", url: "/homework", icon: HomeworkIcon },
         { title: "Mijn Boeken", url: "/books", icon: SchoolBooks },
         { title: "Cijfers", url: "/grades", icon: GradesIcon },
         // { title: "Mijn Woordenlijsten", url: "/results", icon: WordLists },
@@ -81,7 +83,7 @@
                     {#each items as item (item.title)}
                         <Sidebar.MenuItem>
                             <Sidebar.MenuButton
-                                isActive={$page.url.pathname === item.url}
+                                isActive={$page.url.pathname.includes(item.url)}
                             >
                                 {#snippet child({ props })}
                                     <a href={item.url} {...props}>

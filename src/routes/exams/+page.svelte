@@ -50,7 +50,7 @@
                                     class="rounded-t-xl h-50 w-full object-cover"
                                 />
                                 <div class="ml-2 mt-[-20px]">
-                                    <h1 class="text-2xl">{exam.vak}</h1>
+                                    <h1 class="text-2xl truncate">{exam.vak}</h1>
                                     <p class="text-sm">{exam.formattedDate}</p>
                                 </div>
                             </Card.Root>

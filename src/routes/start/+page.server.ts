@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { prisma } from '$lib/prisma';
 import { redirect } from '@sveltejs/kit';
-import { refreshSomtodayToken, getExams, setProfilePicture } from '@/somtoday';
+import { refreshSomtodayToken, getExams, setProfilePicture, getHomework } from '@/somtoday';
 import { getVakBoekImage } from '$lib/books';
 import { getUserFromCookie } from '@/auth';
 
@@ -22,20 +22,6 @@ export const load: PageServerLoad = async ({ cookies }) => {
     name: session.name ?? "User",
     avatar: session.profilePicture?.toString() || ""
   };
-  try {
-    const refreshtoken = await refreshSomtodayToken(session.id);
-
-    const updatedUser = await prisma.user.findUnique({
-      where: { id: session.id }
-    });
-
-    if (updatedUser?.somtodayToken) {
-      session.somtodayToken = updatedUser.somtodayToken;
-    }
-    console.log(refreshtoken)
-  } catch (error) {
-    console.log(error)
-  }
 
   if (!session.somtodayToken) {
     return {
@@ -117,9 +103,12 @@ export const load: PageServerLoad = async ({ cookies }) => {
   mappedExams.sort((a, b) => a.date.getTime() - b.date.getTime());
   const profilepic = await setProfilePicture(user.id)
 
+  const homework = await getHomework(session.somtodayToken);
+
   return {
     user,
     exams: mappedExams,
+    homework,
     error: null
   };
 };
