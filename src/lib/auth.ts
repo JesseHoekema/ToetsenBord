@@ -69,3 +69,38 @@ export async function getUserFromCookie(cookie: string): Promise<{
     return null;
   }
 }
+
+export async function changePassword(userId: number, oldPassword: string, newPassword: string): Promise<AuthResult> {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) return { success: false, message: 'User not found' };
+    const isValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isValid) return { success: false, message: 'Verkeerd oud wachtwoord' };
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({ where: { id: userId }, data: { password: hashedPassword } });
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, message: err.message };
+  }
+}
+
+export async function changeUserInfo(userId: number, name: string, email: string): Promise<AuthResult> {
+  try {
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing && existing.id !== userId) return { success: false, message: 'Email already in use' };
+    await prisma.user.update({ where: { id: userId }, data: { name, email } });
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, message: err.message };
+  }
+}
+
+export async function deleteAccount(userId: number): Promise<AuthResult> {
+  try {
+    await prisma.session.deleteMany({ where: { userId } });
+    await prisma.user.delete({ where: { id: userId } });
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, message: err.message };
+  }
+}

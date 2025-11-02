@@ -37,6 +37,7 @@ model Exam {
   createdAt DateTime  @default(now())
   vak       String
   dateDue   DateTime
+  userId    Int?
   notes     String?   @db.LongText
   links     Json      @default("[]")
   books     Json      @default("[]")
@@ -46,6 +47,7 @@ model Homework {
   createdAt DateTime  @default(now())
   vak       String
   dateDue   DateTime
+  userId    Int?
   notes     String?   @db.LongText
   links     Json      @default("[]")
 }

@@ -10,7 +10,7 @@
     import { useSidebar } from "$lib/components/ui/sidebar/index.js";
     import { onMount, tick, onDestroy } from "svelte";
     import { mode } from "mode-watcher";
-  import { Title } from "./ui/alert-dialog";
+    import { Title } from "./ui/alert-dialog";
 
     export let user: { name: string; email: string; avatar: string };
 

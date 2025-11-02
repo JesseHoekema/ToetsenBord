@@ -4,10 +4,8 @@
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import * as Sidebar from "$lib/components/ui/sidebar/index.js";
     import LogoutIcon from "@lucide/svelte/icons/log-out";
-    import MoonIcon from '@lucide/svelte/icons/moon'
-    import SunIcon from '@lucide/svelte/icons/sun'
+    import SettingsIcon from '@lucide/svelte/icons/settings'
     import { goto } from "$app/navigation";
-    import { mode, toggleMode } from "mode-watcher";
     import { Item } from "./ui/breadcrumb";
     let { user }: { user: { name: string; email: string; avatar: string } } =
         $props();
@@ -102,14 +100,9 @@
                     </div>
                     Somtoday Integratie
                 </DropdownMenu.Item>
-                <DropdownMenu.Item onclick={toggleMode}>
-                    {#if mode.current === 'dark'}
-                        <SunIcon class="mr-2" />
-                        Licht
-                    {:else}
-                        <MoonIcon class="mr-2" />
-                        Donker
-                    {/if}
+                <DropdownMenu.Item onclick={() => goto('/settings')}>
+                    <SettingsIcon class="mr-2" />
+                    Instellingen
                 </DropdownMenu.Item>
                 <DropdownMenu.Item class="cursor-pointer" onclick={logoutUser}>
                     <LogoutIcon class="mr-2" /> Uitloggen

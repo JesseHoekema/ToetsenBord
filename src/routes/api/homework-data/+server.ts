@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     if (!token) {
       return new Response(JSON.stringify({ error: 'Not autenticated' }), { status: 401 });
     }
-    const user = getUserFromCookie(token)
+    const user = await getUserFromCookie(token)
 
     if (!user) {
       return new Response(JSON.stringify({ error: 'Not autenticated' }), { status: 401 });
@@ -27,27 +27,27 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     switch (action) {
       case 'editNotes':
         if (content === '') {
-          result = await editNotes(vak, dateDue, content);
+          result = await editNotes(user.id, vak, dateDue, content);
           break;
         }
         if (!content) {
           return new Response(JSON.stringify({ error: 'Missing notes content' }), { status: 400 });
         }
-        result = await editNotes(vak, dateDue, content);
+        result = await editNotes(user.id, vak, dateDue, content);
         break;
 
       case 'addLink':
         if (!content) {
           return new Response(JSON.stringify({ error: 'Missing link URL' }), { status: 400 });
         }
-        result = await addLink(vak, dateDue, content);
+        result = await addLink(user.id, vak, dateDue, content);
         break;
 
       case 'removeLink':
         if (!content) {
           return new Response(JSON.stringify({ error: 'Missing link URL' }), { status: 400 });
         }
-        result = await removeLink(vak, dateDue, content);
+        result = await removeLink(user.id, vak, dateDue, content);
         break;
       default:
         return new Response(JSON.stringify({ error: 'Invalid action' }), { status: 400 });
