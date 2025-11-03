@@ -496,6 +496,12 @@ export async function getAllHomework(authToken: string) {
             })
     );
 
+    homework.sort((a, b) => {
+        const dateA = a.oldDatum ? new Date(a.oldDatum).getTime() : 0;
+        const dateB = b.oldDatum ? new Date(b.oldDatum).getTime() : 0;
+        return dateA - dateB;
+    });
+
     return homework;
 }
 export async function getHomeworkItem(vak: string, datum: string, authToken: string) {
@@ -624,6 +630,12 @@ export async function getHomework(authToken: string) {
                 };
             })
     );
+
+    homework.sort((a, b) => {
+        const dateA = a.OldDatum ? new Date(a.OldDatum).getTime() : 0;
+        const dateB = b.OldDatum ? new Date(b.OldDatum).getTime() : 0;
+        return dateA - dateB;
+    });
 
     return homework;
 }
