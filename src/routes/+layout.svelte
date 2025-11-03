@@ -27,6 +27,7 @@
 	<!-- <title
 		>{pathname ? `${pathname} | ToetsenBord` : "Home | ToetsenBord"}</title
 	> -->
+	<script defer src="https://umami.jessehoekema.com/script.js" data-website-id="3ade8ee6-c62a-468d-85ac-2b01da7bc5f3"></script>
 </svelte:head>
 
 <ModeWatcher />
