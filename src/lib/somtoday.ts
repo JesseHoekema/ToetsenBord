@@ -491,7 +491,13 @@ export async function getAllHomework(authToken: string) {
                     oldDatum: item.datumTijd,
                     lesgroep: item.lesgroep.naam,
                     imageUrl,
-                    link: homeworkLink
+                    link: homeworkLink,
+                    bijlagen: (item.studiewijzerItem?.bijlagen || []).flatMap((bijlage: any) =>
+                        (bijlage.assemblyResults || []).map((result: any) => ({
+                            name: result.fileName || bijlage.omschrijving || 'unknown',
+                            url: result.fileUrl || result.sslUrl,
+                        }))
+                    )
                 };
             })
     );
@@ -527,8 +533,8 @@ export async function getHomeworkItem(vak: string, datum: string, authToken: str
         select: {
             dateDue: true,
             notes: true,
-            links: true
-        }
+            links: true,
+        },
     });
 
     const homeworkRecord = allHomework.find((h) => {
@@ -541,15 +547,19 @@ export async function getHomeworkItem(vak: string, datum: string, authToken: str
     const homeworkDate = new Date(matchingHomework.oldDatum);
     const formattedDate = homeworkDate.toLocaleDateString('nl-NL', {
         day: 'numeric',
-        month: 'long'
+        month: 'long',
     });
+
+    const bijlagen = matchingHomework.bijlagen || [];
+
 
     return {
         ...matchingHomework,
         image_url,
         formattedDate,
         notes: homeworkRecord?.notes || '',
-        links: (homeworkRecord?.links as string[]) || []
+        links: (homeworkRecord?.links as string[]) || [],
+        bijlagen,
     };
 }
 export async function getHomework(authToken: string) {

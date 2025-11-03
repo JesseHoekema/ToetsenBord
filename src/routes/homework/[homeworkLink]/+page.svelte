@@ -11,6 +11,7 @@
   import DropIcon from "@lucide/svelte/icons/chevron-down";
   import TrashIcon from "@lucide/svelte/icons/trash";
   import { Input } from "$lib/components/ui/input/index.js";
+  import FileIcon from "@lucide/svelte/icons/file";
 
   const { data } = $props();
 
@@ -74,67 +75,67 @@
   }
 
   async function handleSaveLink() {
-            let normalizedLink = linkInput.trim();
-            if (!/^https?:\/\//i.test(normalizedLink)) {
-                normalizedLink = "https://" + normalizedLink;
-            }
-
-            if (homeworkLinks.includes(normalizedLink)) {
-                toast.error("Deze link bestaat al");
-                return;
-            }
-
-            const response = await fetch("/api/homework-data", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    action: "addLink",
-                    vak: data.homeworkItem.vak,
-                    dateDue: data.homeworkItem.oldDatum,
-                    content: normalizedLink,
-                }),
-            });
-
-            if (response.ok) {
-                toast.success("Link opgeslagen");
-                homeworkLinks = [...homeworkLinks, normalizedLink];
-                linkInput = "";
-            } else {
-                toast.error("Link opslaan is niet gelukt");
-            }
+    let normalizedLink = linkInput.trim();
+    if (!/^https?:\/\//i.test(normalizedLink)) {
+      normalizedLink = "https://" + normalizedLink;
     }
 
-    function handleLinkKeyPress(event: KeyboardEvent) {
-        if (event.key === "Enter") {
-            handleSaveLink();
-        }
+    if (homeworkLinks.includes(normalizedLink)) {
+      toast.error("Deze link bestaat al");
+      return;
     }
-    async function removeLink(link: string) {
-        try {
-            const response = await fetch("/api/homework-data", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    action: "removeLink",
-                    vak: data.homeworkItem.vak,
-                    dateDue: data.homeworkItem.oldDatum,
-                    content: link,
-                }),
-            });
 
-            if (response.ok) {
-                toast.success("Link verwijderd");
-                homeworkLinks = homeworkLinks.filter((l) => l !== link);
-            } else {
-                toast.error("Link verwijderen is niet gelukt");
-            }
-        } catch (error) {
-            console.log(error);
-            toast.error("Link verwijderen is niet gelukt");
-        }
+    const response = await fetch("/api/homework-data", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "addLink",
+        vak: data.homeworkItem.vak,
+        dateDue: data.homeworkItem.oldDatum,
+        content: normalizedLink,
+      }),
+    });
+
+    if (response.ok) {
+      toast.success("Link opgeslagen");
+      homeworkLinks = [...homeworkLinks, normalizedLink];
+      linkInput = "";
+    } else {
+      toast.error("Link opslaan is niet gelukt");
     }
+  }
+
+  function handleLinkKeyPress(event: KeyboardEvent) {
+    if (event.key === "Enter") {
+      handleSaveLink();
+    }
+  }
+  async function removeLink(link: string) {
+    try {
+      const response = await fetch("/api/homework-data", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "removeLink",
+          vak: data.homeworkItem.vak,
+          dateDue: data.homeworkItem.oldDatum,
+          content: link,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Link verwijderd");
+        homeworkLinks = homeworkLinks.filter((l) => l !== link);
+      } else {
+        toast.error("Link verwijderen is niet gelukt");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Link verwijderen is niet gelukt");
+    }
+  }
 </script>
 
 <svelte:head>
@@ -190,6 +191,30 @@
           </p>
         </Card.Content>
       </Card.Root>
+      {#if data.homeworkItem.bijlagen.length > 0}
+        <Card.Root class="mt-5">
+          <Card.Content>
+            <h1 class="text-2xl font-medium mb-3">Bijlagen</h1>
+            {#each data.homeworkItem.bijlagen as bijlage}
+              <Card.Root class="mt-3 p-4 cursor-pointer">
+                <Card.Content class="px-1 flex justify-between items-center">
+                  <a
+                    href={bijlage.url}
+                    class="flex gap-3 items-center"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <FileIcon class="text-muted-foreground" />
+                    <h1 class="hover:underline transition-all">
+                      {bijlage.name}
+                    </h1>
+                  </a>
+                </Card.Content>
+              </Card.Root>
+            {/each}
+          </Card.Content>
+        </Card.Root>
+      {/if}
       <Card.Root class="mt-5">
         <Card.Content>
           <div class="flex items-center justify-between mb-3">
