@@ -3,6 +3,11 @@
   import * as NavigationMenu from "$lib/components/ui/navigation-menu/index.js";
   import { navigationMenuTriggerStyle } from "$lib/components/ui/navigation-menu/navigation-menu-trigger.svelte";
   import Button from "@/components/ui/button/button.svelte";
+  import { page } from '$app/stores';
+
+  $: homeLink = $page.url.pathname === '/' ? '#home' : '/';
+  $: waaromLink = $page.url.pathname === '/' ? '#waarom' : '/#waarom';
+  $: featuresLink = $page.url.pathname === '/' ? '#features' : '/#features';
 </script>
 
 <Card.Root class="fixed top-[-3px] left-[-3px] right-[-3px] rounded-none z-50">
@@ -16,9 +21,10 @@
           <NavigationMenu.Item>
             <NavigationMenu.Link>
               {#snippet child()}
-                <a href="#home" class={navigationMenuTriggerStyle()}>Home</a>
-                <a href="#waarom" class={navigationMenuTriggerStyle()}>Waarom</a>
-                <a href="#features" class={navigationMenuTriggerStyle()}>Features</a>
+                <a href={homeLink} class={navigationMenuTriggerStyle()}>Home</a>
+                <a href={waaromLink} class={navigationMenuTriggerStyle()}>Waarom</a>
+                <a href={featuresLink} class={navigationMenuTriggerStyle()}>Features</a>
+                <a href="/team" class={navigationMenuTriggerStyle()}>Team</a>
               {/snippet}
             </NavigationMenu.Link>
           </NavigationMenu.Item>
