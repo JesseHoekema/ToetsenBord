@@ -99,6 +99,9 @@
                 </Card.Header>
                 <Card.Content>
                     <ul class="mb-4">
+                        <ul>
+                            <a href="/somtoday-integration/koppelvideo" target="_blank" class="text-blue-500 underline">Bekijk de koppelvideo!</a>
+                        </ul>
                         <li class="mb-2">
                             1. Ga naar somtoday en <a href="/api/somtoday/bookmark" target="_blank" class="text-blue-500 underline">open deze link</a>
                         </li>
