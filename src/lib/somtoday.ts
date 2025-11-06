@@ -1,4 +1,5 @@
 import { prisma } from '$lib/prisma';
+import { get } from 'svelte/store';
 import { getVakBoekImage } from './books';
 import { getIcon } from './icons';
 
@@ -133,6 +134,7 @@ export async function getExams(authToken: string) {
             lesgroep: item.lesgroep.naam
         }));
 
+
     return exams;
 }
 
@@ -263,15 +265,6 @@ export async function getExam(vak: string, datum: string, authToken: string) {
 }
 
 export async function getAllExams(authToken: string) {
-    const startDate = new Date();
-    const day = startDate.getDay();
-    if (day === 6) {
-        startDate.setDate(startDate.getDate() + 2);
-    } else if (day === 0) {
-        startDate.setDate(startDate.getDate() + 1);
-    }
-
-    const formattedDate = startDate.toISOString().split('T')[0];
 
     const url = `https://api.somtoday.nl/rest/v1/studiewijzeritemafspraaktoekenningen`;
 
@@ -291,6 +284,10 @@ export async function getAllExams(authToken: string) {
     }
 
     const data = await response.json();
+
+
+    // for better and more results
+    const oncomingExams = await getExams(authToken);
 
     const exams = data.items
         .filter((item: any) =>
@@ -319,6 +316,22 @@ export async function getAllExams(authToken: string) {
             datum: item.datumTijd,
             lesgroep: item.lesgroep.naam
         }));
+
+    const resolvedOncomingExams = oncomingExams;
+
+    if (oncomingExams) {
+        oncomingExams.forEach((oncomingExam: any) => {
+            const exists = exams.some((exam: any) =>
+                exam.onderwerp === oncomingExam.onderwerp &&
+                exam.vak === oncomingExam.vak &&
+                exam.datum === oncomingExam.datum
+            );
+
+            if (!exists) {
+                exams.push(oncomingExam);
+            }
+        });
+    }
 
     return exams;
 }
@@ -427,141 +440,6 @@ export async function getGrades(authToken: string) {
     }
 }
 
-export async function getAllHomework(authToken: string) {
-    const url = `https://api.somtoday.nl/rest/v1/studiewijzeritemafspraaktoekenningen`;
-
-    const response = await fetch(url, {
-        headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'Accept': 'application/json'
-        }
-    });
-
-    if (response.status === 401) {
-        return null;
-    }
-
-    if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    const homework = await Promise.all(
-        data.items
-            .filter((item: any) =>
-                item.studiewijzerItem?.huiswerkType?.toLowerCase()?.includes('huiswerk')
-            )
-            .map(async (item: any) => {
-                const vak = item.lesgroep.vak.naam
-                    .toLowerCase()
-                    .split(' ')
-                    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ');
-
-                const imageUrl = await getVakBoekImage(vak);
-
-                const homeworkLink = `/homework/${vak
-                    .toLowerCase()
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .replace(/[^a-z0-9]+/g, '-')
-                    .replace(/^-+|-+$/g, '')}-${item.datumTijd ? new Date(item.datumTijd).toISOString().split('T')[0] : 'no-date'}`;
-
-                return {
-                    onderwerp: item.studiewijzerItem.onderwerp,
-                    omschrijving: item.studiewijzerItem.omschrijving
-                        .replace(/\\u003C/g, '<')
-                        .replace(/\\u003E/g, '>')
-                        .replace(/&#39;/g, "'")
-                        .replace(/<p[^>]*>/g, '')
-                        .replace(/<\/p>/g, '\n')
-                        .replace(/<li[^>]*>/g, '- ')
-                        .replace(/<\/li>/g, '\n')
-                        .replace(/<ul[^>]*>/g, '')
-                        .replace(/<\/ul>/g, '\n')
-                        .replace(/<[^>]+>/g, '')
-                        .replace(/\n\s*\n/g, '\n')
-                        .trim(),
-                    vak,
-                    datum: item.datumTijd ? new Date(item.datumTijd).toLocaleDateString('nl-NL', {
-                        day: 'numeric',
-                        month: 'long'
-                    }) : null,
-                    oldDatum: item.datumTijd,
-                    lesgroep: item.lesgroep.naam,
-                    imageUrl,
-                    link: homeworkLink,
-                    bijlagen: (item.studiewijzerItem?.bijlagen || []).flatMap((bijlage: any) =>
-                        (bijlage.assemblyResults || []).map((result: any) => ({
-                            name: result.fileName || bijlage.omschrijving || 'unknown',
-                            url: result.fileUrl || result.sslUrl,
-                        }))
-                    )
-                };
-            })
-    );
-
-    homework.sort((a, b) => {
-        const dateA = a.oldDatum ? new Date(a.oldDatum).getTime() : 0;
-        const dateB = b.oldDatum ? new Date(b.oldDatum).getTime() : 0;
-        return dateA - dateB;
-    });
-
-    return homework;
-}
-export async function getHomeworkItem(vak: string, datum: string, authToken: string) {
-    const homework = await getAllHomework(authToken);
-
-    if (!homework) return null;
-
-    const normalizedVak = vak.trim().toLowerCase();
-    const targetDate = new Date(datum);
-    const { month: targetMonth, day: targetDay } = getMonthDay(targetDate);
-
-    const matchingHomework = homework.find((homeworkItem: any) => {
-        const homeworkDate = new Date(homeworkItem.oldDatum);
-        const { month, day } = getMonthDay(homeworkDate);
-        const homeworkVak = (homeworkItem.vak || '').trim().toLowerCase();
-        return homeworkVak === normalizedVak && month === targetMonth && day === targetDay;
-    });
-
-    if (!matchingHomework) return null;
-
-    const allHomework = await prisma.homework.findMany({
-        where: { vak: vak },
-        select: {
-            dateDue: true,
-            notes: true,
-            links: true,
-        },
-    });
-
-    const homeworkRecord = allHomework.find((h) => {
-        const { month, day } = getMonthDay(new Date(h.dateDue));
-        return month === targetMonth && day === targetDay;
-    });
-
-    const image_url = await getVakBoekImage(vak);
-
-    const homeworkDate = new Date(matchingHomework.oldDatum);
-    const formattedDate = homeworkDate.toLocaleDateString('nl-NL', {
-        day: 'numeric',
-        month: 'long',
-    });
-
-    const bijlagen = matchingHomework.bijlagen || [];
-
-
-    return {
-        ...matchingHomework,
-        image_url,
-        formattedDate,
-        notes: homeworkRecord?.notes || '',
-        links: (homeworkRecord?.links as string[]) || [],
-        bijlagen,
-    };
-}
 export async function getHomework(authToken: string) {
     const startDate = new Date();
     const day = startDate.getDay();
@@ -648,4 +526,157 @@ export async function getHomework(authToken: string) {
     });
 
     return homework;
+}
+
+export async function getAllHomework(authToken: string) {
+    const url = `https://api.somtoday.nl/rest/v1/studiewijzeritemafspraaktoekenningen`;
+
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Accept': 'application/json'
+        }
+    });
+
+    if (response.status === 401) {
+        return null;
+    }
+
+    if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    const homework = await Promise.all(
+        data.items
+            .filter((item: any) =>
+                item.studiewijzerItem?.huiswerkType?.toLowerCase()?.includes('huiswerk')
+            )
+            .map(async (item: any) => {
+                const vak = item.lesgroep.vak.naam
+                    .toLowerCase()
+                    .split(' ')
+                    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ');
+
+                const imageUrl = await getVakBoekImage(vak);
+
+                const homeworkLink = `/homework/${vak
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '')}-${item.datumTijd ? new Date(item.datumTijd).toISOString().split('T')[0] : 'no-date'}`;
+
+                return {
+                    onderwerp: item.studiewijzerItem.onderwerp,
+                    omschrijving: item.studiewijzerItem.omschrijving
+                        .replace(/\\u003C/g, '<')
+                        .replace(/\\u003E/g, '>')
+                        .replace(/&#39;/g, "'")
+                        .replace(/<p[^>]*>/g, '')
+                        .replace(/<\/p>/g, '\n')
+                        .replace(/<li[^>]*>/g, '- ')
+                        .replace(/<\/li>/g, '\n')
+                        .replace(/<ul[^>]*>/g, '')
+                        .replace(/<\/ul>/g, '\n')
+                        .replace(/<[^>]+>/g, '')
+                        .replace(/\n\s*\n/g, '\n')
+                        .trim(),
+                    vak,
+                    datum: item.datumTijd ? new Date(item.datumTijd).toLocaleDateString('nl-NL', {
+                        day: 'numeric',
+                        month: 'long'
+                    }) : null,
+                    oldDatum: item.datumTijd,
+                    lesgroep: item.lesgroep.naam,
+                    imageUrl,
+                    link: homeworkLink,
+                    bijlagen: (item.studiewijzerItem?.bijlagen || []).flatMap((bijlage: any) =>
+                        (bijlage.assemblyResults || []).map((result: any) => ({
+                            name: result.fileName || bijlage.omschrijving || 'unknown',
+                            url: result.fileUrl || result.sslUrl,
+                        }))
+                    )
+                };
+            })
+
+    );
+
+    homework.sort((a, b) => {
+        const dateA = a.oldDatum ? new Date(a.oldDatum).getTime() : 0;
+        const dateB = b.oldDatum ? new Date(b.oldDatum).getTime() : 0;
+        return dateA - dateB;
+    });
+
+    const oncomingHomework = await getHomework(authToken);
+
+    if (oncomingHomework) {
+        oncomingHomework.forEach((oncomingItem: any) => {
+            const exists = homework.some((item: any) =>
+                item.onderwerp === oncomingItem.onderwerp &&
+                item.vak === oncomingItem.vak &&
+                item.oldDatum === oncomingItem.oldDatum
+            );
+
+            if (!exists) {
+                homework.push(oncomingItem);
+            }
+        });
+    }
+
+    return homework;
+}
+export async function getHomeworkItem(vak: string, datum: string, authToken: string) {
+    const homework = await getAllHomework(authToken);
+
+    if (!homework) return null;
+
+    const normalizedVak = vak.trim().toLowerCase();
+    const targetDate = new Date(datum);
+    const { month: targetMonth, day: targetDay } = getMonthDay(targetDate);
+
+    const matchingHomework = homework.find((homeworkItem: any) => {
+        const homeworkDate = new Date(homeworkItem.oldDatum);
+        const { month, day } = getMonthDay(homeworkDate);
+        const homeworkVak = (homeworkItem.vak || '').trim().toLowerCase();
+        return homeworkVak === normalizedVak && month === targetMonth && day === targetDay;
+    });
+
+    if (!matchingHomework) return null;
+
+    const allHomework = await prisma.homework.findMany({
+        where: { vak: vak },
+        select: {
+            dateDue: true,
+            notes: true,
+            links: true,
+        },
+    });
+
+    const homeworkRecord = allHomework.find((h) => {
+        const { month, day } = getMonthDay(new Date(h.dateDue));
+        return month === targetMonth && day === targetDay;
+    });
+
+    const image_url = await getVakBoekImage(vak);
+
+    const homeworkDate = new Date(matchingHomework.oldDatum);
+    const formattedDate = homeworkDate.toLocaleDateString('nl-NL', {
+        day: 'numeric',
+        month: 'long',
+    });
+
+    const bijlagen = matchingHomework.bijlagen || [];
+
+
+    return {
+        ...matchingHomework,
+        image_url,
+        formattedDate,
+        notes: homeworkRecord?.notes || '',
+        links: (homeworkRecord?.links as string[]) || [],
+        bijlagen,
+    };
 }
