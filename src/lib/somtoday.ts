@@ -265,8 +265,19 @@ export async function getExam(vak: string, datum: string, authToken: string) {
 }
 
 export async function getAllExams(authToken: string) {
+    const startDate = new Date();
+    const day = startDate.getDay();
+    if (day === 6) {
+        startDate.setDate(startDate.getDate() + 2);
+    } else if (day === 0) {
+        startDate.setDate(startDate.getDate() + 1);
+    }
+    startDate.setDate(startDate.getDate() - 66);
 
-    const url = `https://api.somtoday.nl/rest/v1/studiewijzeritemafspraaktoekenningen`;
+    const formattedDate = startDate.toISOString().split('T')[0];
+
+
+  const url = `https://api.somtoday.nl/rest/v1/studiewijzeritemafspraaktoekenningen?begintNaOfOp=${formattedDate}`;
 
     const response = await fetch(url, {
         headers: {
@@ -541,7 +552,7 @@ export async function getAllHomework(authToken: string) {
 
     const formattedDate = startDate.toISOString().split('T')[0];
 
-    const url = `https://api.somtoday.nl/rest/v1/studiewijzeritemafspraaktoekenningen?begintNaOfOp=${formattedDate}&additional=swigemaaktVinkjes&additional=leerlingen`;
+    const url = `https://api.somtoday.nl/rest/v1/studiewijzeritemafspraaktoekenningen?begintNaOfOp=${formattedDate}`;
     const response = await fetch(url, {
         headers: {
             'Authorization': `Bearer ${authToken}`,
