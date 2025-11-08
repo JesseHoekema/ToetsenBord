@@ -529,8 +529,19 @@ export async function getHomework(authToken: string) {
 }
 
 export async function getAllHomework(authToken: string) {
-    const url = `https://api.somtoday.nl/rest/v1/studiewijzeritemafspraaktoekenningen`;
 
+    const startDate = new Date();
+    const day = startDate.getDay();
+    if (day === 6) {
+        startDate.setDate(startDate.getDate() + 2);
+    } else if (day === 0) {
+        startDate.setDate(startDate.getDate() + 1);
+    }
+    startDate.setDate(startDate.getDate() - 66);
+
+    const formattedDate = startDate.toISOString().split('T')[0];
+
+    const url = `https://api.somtoday.nl/rest/v1/studiewijzeritemafspraaktoekenningen?begintNaOfOp=${formattedDate}&additional=swigemaaktVinkjes&additional=leerlingen`;
     const response = await fetch(url, {
         headers: {
             'Authorization': `Bearer ${authToken}`,
@@ -610,22 +621,6 @@ export async function getAllHomework(authToken: string) {
         return dateA - dateB;
     });
 
-    const oncomingHomework = await getHomework(authToken);
-
-    if (oncomingHomework) {
-        oncomingHomework.forEach((oncomingItem: any) => {
-            const exists = homework.some((item: any) =>
-                item.onderwerp === oncomingItem.onderwerp &&
-                item.vak === oncomingItem.vak &&
-                item.oldDatum === oncomingItem.oldDatum
-            );
-
-            if (!exists) {
-                homework.push(oncomingItem);
-            }
-        });
-    }
-
     return homework;
 }
 export async function getHomeworkItem(vak: string, datum: string, authToken: string) {
@@ -669,7 +664,6 @@ export async function getHomeworkItem(vak: string, datum: string, authToken: str
     });
 
     const bijlagen = matchingHomework.bijlagen || [];
-
 
     return {
         ...matchingHomework,

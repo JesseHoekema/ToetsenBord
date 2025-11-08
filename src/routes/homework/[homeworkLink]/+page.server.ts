@@ -55,10 +55,22 @@ export const load: PageServerLoad = async ({ cookies, params }) => {
 
     const { vak, datum } = parseHomeworkLink(homeworkLink);
 
-    const homeworkItem = await getHomeworkItem(vak, datum, session.somtodayToken);
+    let homeworkItem = await getHomeworkItem(vak, datum, session.somtodayToken);
+
 
     if (!homeworkItem) {
-        throw redirect(303, '/homework');
+        homeworkItem = {
+            onderwerp: 'Niet gevonden',
+            omschrijving: 'Dit huiswerk is niet gevonden. Controleer of je de juiste link hebt gebruikt.',
+            vak: "niet gevonden",
+            datum: "0000-00-00",
+            image_url: 'https://placehold.co/190x250?text=koppel som',
+            notes: '',
+            links: [],
+            lesgroep: '',
+            bijlagen: [],
+            formattedDate: datum
+        };
     }
 
     return {
