@@ -176,7 +176,7 @@
             class="w-28 h-auto rounded-sm"
           />
           <div class="flex flex-col justify-center">
-            <h1 class="text-4xl font-medium">{data.homeworkItem.vak}</h1>
+            <h1 class="text-4xl font-medium">{data.homeworkItem.vak} - {data.homeworkItem.onderwerp}</h1>
             <p class="text-lg font-medium">
               {data.homeworkItem.formattedDate}
             </p>

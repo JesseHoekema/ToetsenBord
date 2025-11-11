@@ -249,7 +249,7 @@
                         class="w-28 h-auto rounded-sm"
                     />
                     <div class="flex flex-col justify-center">
-                        <h1 class="text-4xl font-medium">{data.exam.vak}</h1>
+                        <h1 class="text-4xl font-medium">{data.exam.vak} - {data.exam.onderwerp}</h1>
                         <p class="text-lg font-medium">
                             {data.exam.formattedDate}
                         </p>
