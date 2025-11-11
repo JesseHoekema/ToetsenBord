@@ -2,6 +2,49 @@ import { prisma } from '$lib/prisma';
 import { get } from 'svelte/store';
 import { getVakBoekImage } from './books';
 import { getIcon } from './icons';
+import crypto from 'crypto';
+
+const ALGORITHM = process.env.ENCRYPTION_ALGORITHM || 'aes-256-gcm';
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
+const KEY_BUFFER = Buffer.from(ENCRYPTION_KEY.slice(0, 64), 'hex');
+
+function encryptToken(token: string): string {
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv(ALGORITHM, KEY_BUFFER, iv);
+    
+    let encrypted = cipher.update(token, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    
+    const authTag = cipher.getAuthTag();
+    
+    return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
+}
+
+function decryptToken(encryptedToken: string): string | null {
+    try {
+        const parts = encryptedToken.split(':');
+        
+        if (parts.length !== 3) {
+            console.warn('Token is not in encrypted format, returning null');
+            return null;
+        }
+        
+        const iv = Buffer.from(parts[0], 'hex');
+        const authTag = Buffer.from(parts[1], 'hex');
+        const encrypted = parts[2];
+        
+        const decipher = crypto.createDecipheriv(ALGORITHM, KEY_BUFFER, iv);
+        decipher.setAuthTag(authTag);
+        
+        let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        
+        return decrypted;
+    } catch (error) {
+        console.error('Failed to decrypt token:', error);
+        return null;
+    }
+}
 
 
 export async function connectWithAccessToken(
@@ -50,8 +93,8 @@ export async function connectWithAccessToken(
         await prisma.user.update({
             where: { id: userId },
             data: {
-                somtodayToken: actualAccessToken,
-                somtodayRefreshToken: refreshToken,
+                somtodayToken: encryptToken(actualAccessToken),
+                somtodayRefreshToken: encryptToken(refreshToken),
                 somtodayTokenExpires: expiresAtNumber,
                 somtodayTokenUpdatedAt: new Date(),
             },
@@ -74,6 +117,11 @@ export async function connectWithAccessToken(
 }
 
 export async function getExams(authToken: string) {
+    const decryptedToken = decryptToken(authToken);
+    if (!decryptedToken) {
+        return null;
+    }
+    
     const startDate = new Date();
     const day = startDate.getDay();
     if (day === 6) {
@@ -88,7 +136,7 @@ export async function getExams(authToken: string) {
 
     const response = await fetch(url, {
         headers: {
-            'Authorization': `Bearer ${authToken}`,
+            'Authorization': `Bearer ${decryptedToken}`,
             'Accept': 'application/json'
         }
     });
@@ -102,9 +150,6 @@ export async function getExams(authToken: string) {
     }
 
     const data = await response.json();
-
-
-
 
     const exams = data.items
         .filter((item: any) =>
@@ -157,12 +202,20 @@ export async function refreshSomtodayToken(
             };
         }
 
+        const decryptedRefreshToken = decryptToken(user.somtodayRefreshToken);
+        if (!decryptedRefreshToken) {
+            return {
+                success: false,
+                message: 'Token kon niet worden ontsleuteld. Verbind opnieuw met Somtoday.'
+            };
+        }
+
         const response = await fetch('https://somtoday.nl/oauth2/token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
                 grant_type: 'refresh_token',
-                refresh_token: user.somtodayRefreshToken,
+                refresh_token: decryptedRefreshToken,
                 client_id: 'somtoday-leerling-web',
                 scope: 'openid'
             })
@@ -186,8 +239,8 @@ export async function refreshSomtodayToken(
         await prisma.user.update({
             where: { id: userId },
             data: {
-                somtodayToken: data.access_token,
-                somtodayRefreshToken: data.refresh_token,
+                somtodayToken: encryptToken(data.access_token),
+                somtodayRefreshToken: encryptToken(data.refresh_token),
                 somtodayTokenUpdatedAt: new Date(),
             },
         });
@@ -265,6 +318,11 @@ export async function getExam(vak: string, datum: string, authToken: string) {
 }
 
 export async function getAllExams(authToken: string) {
+    const decryptedToken = decryptToken(authToken);
+    if (!decryptedToken) {
+        throw new Error('Somtoday token kon niet worden ontsleuteld');
+    }
+    
     const startDate = new Date();
     const day = startDate.getDay();
     if (day === 6) {
@@ -281,7 +339,7 @@ export async function getAllExams(authToken: string) {
 
     const response = await fetch(url, {
         headers: {
-            'Authorization': `Bearer ${authToken}`,
+            'Authorization': `Bearer ${decryptedToken}`,
             'Accept': 'application/json'
         }
     });
@@ -357,9 +415,15 @@ export async function setProfilePicture(userId: number) {
         throw new Error('User not found');
     }
     if (user.somtodayToken && !user.profilePicture) {
+        const decryptedToken = decryptToken(user.somtodayToken);
+        if (!decryptedToken) {
+            console.error('Failed to decrypt Somtoday token for profile picture');
+            return;
+        }
+        
         const response = await fetch('https://api.somtoday.nl/rest/v1/leerlingen', {
             headers: {
-                Authorization: `Bearer ${user.somtodayToken}`,
+                Authorization: `Bearer ${decryptedToken}`,
                 Accept: 'application/json'
             }
         });
@@ -375,9 +439,14 @@ export async function setProfilePicture(userId: number) {
     }
 }
 export async function getStudent(authToken: string) {
+    const decryptedToken = decryptToken(authToken);
+    if (!decryptedToken) {
+        throw new Error('Somtoday token kon niet worden ontsleuteld');
+    }
+    
     const response = await fetch('https://api.somtoday.nl/rest/v1/leerlingen', {
         headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${decryptedToken}`,
             Accept: 'application/json'
         }
     });
@@ -390,6 +459,12 @@ export async function getStudent(authToken: string) {
 }
 export async function getGrades(authToken: string) {
     try {
+        const decryptedToken = decryptToken(authToken);
+        if (!decryptedToken) {
+            console.error('Failed to decrypt token for grades');
+            return null;
+        }
+        
         const student = await getStudent(authToken);
         if (!student.items || student.items.length === 0) {
             throw new Error('No students found for this token.');
@@ -399,7 +474,7 @@ export async function getGrades(authToken: string) {
 
         const response = await fetch(`https://api.somtoday.nl/rest/v1/resultaten/huidigVoorLeerling/${id}`, {
             headers: {
-                Authorization: `Bearer ${authToken}`,
+                Authorization: `Bearer ${decryptedToken}`,
                 Accept: 'application/json',
             },
         });
@@ -452,6 +527,11 @@ export async function getGrades(authToken: string) {
 }
 
 export async function getHomework(authToken: string) {
+    const decryptedToken = decryptToken(authToken);
+    if (!decryptedToken) {
+        return null;
+    }
+    
     const startDate = new Date();
     const day = startDate.getDay();
     if (day === 6) {
@@ -466,7 +546,7 @@ export async function getHomework(authToken: string) {
 
     const response = await fetch(url, {
         headers: {
-            'Authorization': `Bearer ${authToken}`,
+            'Authorization': `Bearer ${decryptedToken}`,
             'Accept': 'application/json'
         }
     });
@@ -540,6 +620,10 @@ export async function getHomework(authToken: string) {
 }
 
 export async function getAllHomework(authToken: string) {
+    const decryptedToken = decryptToken(authToken);
+    if (!decryptedToken) {
+        return null;
+    }
 
     const startDate = new Date();
     const day = startDate.getDay();
@@ -555,7 +639,7 @@ export async function getAllHomework(authToken: string) {
     const url = `https://api.somtoday.nl/rest/v1/studiewijzeritemafspraaktoekenningen?begintNaOfOp=${formattedDate}`;
     const response = await fetch(url, {
         headers: {
-            'Authorization': `Bearer ${authToken}`,
+            'Authorization': `Bearer ${decryptedToken}`,
             'Accept': 'application/json'
         }
     });
