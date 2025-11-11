@@ -2,7 +2,7 @@ import { prisma } from '$lib/prisma';
 import { get } from 'svelte/store';
 import { getVakBoekImage } from './books';
 import { getIcon } from './icons';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 const ALGORITHM = process.env.ENCRYPTION_ALGORITHM || 'aes-256-gcm';
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
@@ -15,7 +15,7 @@ function encryptToken(token: string): string {
     let encrypted = cipher.update(token, 'utf8', 'hex');
     encrypted += cipher.final('hex');
     
-    const authTag = cipher.getAuthTag();
+    const authTag = (cipher as any).getAuthTag();
     
     return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
 }
@@ -33,7 +33,7 @@ function decryptToken(encryptedToken: string): string | null {
         const authTag = Buffer.from(parts[1], 'hex');
         const encrypted = parts[2];
         
-        const decipher = crypto.createDecipheriv(ALGORITHM, KEY_BUFFER, iv);
+        const decipher = crypto.createDecipheriv(ALGORITHM, KEY_BUFFER, iv) as any;
         decipher.setAuthTag(authTag);
         
         let decrypted = decipher.update(encrypted, 'hex', 'utf8');
