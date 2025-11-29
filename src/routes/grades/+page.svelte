@@ -76,10 +76,11 @@
                                         {grade.weging}x
                                     </div>
                                     <div
-                                        class="text-4xl font-medium tracking-tight {grade.type ===
-                                        'onvoldoende'
-                                            ? 'text-red-500'
-                                            : 'text-green-500'}"
+                                        class="text-4xl font-medium tracking-tight {grade.weging <= 0
+                                            ? 'text-gray-500'
+                                            : grade.type === 'onvoldoende'
+                                                ? 'text-red-500'
+                                                : 'text-green-500'}"
                                     >
                                         {grade.grade}
                                     </div>
