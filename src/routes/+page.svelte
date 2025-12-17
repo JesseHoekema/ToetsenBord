@@ -36,7 +36,10 @@
 
 <TopMenu />
 <div id="home"></div>
-<div class="flex flex-col md:flex-row items-center justify-center md:justify-between w-full px-4 sm:px-8 md:px-12 py-10 mt-20 md:mt-25 gap-6 md:gap-0">
+<div class="absolute top-38 ml-12 right-4 z-0">
+    <img src="/assets/mockup_4.png" alt="App Mockup" class="w-500  opacity-70 select-none pointer-events-none user-select-none" />
+</div>
+<div class="flex flex-col md:flex-row items-center justify-center md:justify-between w-full px-4 sm:px-8 md:px-12 py-10 mt-20 md:mt-25 gap-6 md:gap-0 z-20 relative">
     <img src="/assets/logo-icon.png" alt="Logo" class="w-24 sm:w-32 md:w-28 lg:w-88" />
     <div class="flex-1 max-w-2xl">
         <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center md:text-left max-w-xl mx-auto md:mx-0">"Maar ik kon de toets niet vinden in som"</h1>
@@ -48,7 +51,7 @@
 <!-- div for waarom in nav -->
 <div id="waarom"></div>
 
-<section class="mt-20 sm:mt-28 md:mt-36 flex flex-col items-center px-4 sm:px-6">
+<section class="mt-20 sm:mt-28 md:mt-36 flex flex-col items-center px-4 sm:px-6 z-20 relative">
     <h1 class="text-2xl sm:text-3xl md:text-4xl text-center mb-6">Waarom <span class="font-bold"><span class="text-[#76A9FF]">Toetsen</span>Bord?</span></h1>
     <div class="shadow-lg rounded-2xl px-4 sm:px-6 md:px-8 py-6 sm:py-8 max-w-3xl w-full flex flex-col items-center">
         <div class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
