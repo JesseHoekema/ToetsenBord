@@ -45,8 +45,8 @@
                 {#each (data.grades ?? []).slice().reverse() as grade}
                     <Card.Root class="rounded-2xl min-w-fit">
                         <Card.Content>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
                                     <div
                                         class="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
                                         class:bg-zinc-800={mode.current ===
@@ -56,20 +56,20 @@
                                     >
                                         <div>{@html grade.icon}</div>
                                     </div>
-                                    <div class="flex flex-col">
+                                    <div class="flex flex-col min-w-0">
                                         <h2
-                                            class="text-lg font-normal mb-1 whitespace-nowrap"
+                                            class="text-lg font-normal mb-1 truncate"
                                         >
                                             {grade.vak}
                                         </h2>
                                         <p
-                                            class="text-zinc-500 text-xs whitespace-nowrap"
+                                            class="text-zinc-500 text-xs truncate max-w-xs"
                                         >
                                             {grade.datum} · {grade.omschrijving}
                                         </p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-4">
+                                <div class="flex items-center gap-4 flex-shrink-0">
                                     <div
                                         class="text-xs font-medium text-muted-foreground mt-1"
                                     >
